@@ -2,18 +2,7 @@
 
 You'll find everything you need to learn and implement a Reveal SDK application (both client and server) in this organization. This documents includes the general over of Reveal, links to source code for getting started samples, links to product documentation, support and video training.
 
-Server Examples:
-
-- Basic .NET Core / SQL Server with limited comments - [netcore-server-basic](https://github.com/RevealBi-SqlServer/netcore-server-basic)
-- Advanced / heavily commented .NET Core / SQL Server implementation - [netcore-server](https://github.com/RevealBi-SqlServer/netcore-server)
-- NodeJS TypeScript / SQL Server implementation - [node-ts](https://github.com/RevealBi-SqlServer/node-ts)
-
-
-Client Examples:
-
-- Using HTML - [html](https://github.com/RevealBi-SqlServer/html)
-- Using Angular - [angular-client](https://github.com/RevealBi-SqlServer/angular-client)
-- Using React - [react-client](https://github.com/RevealBi-SqlServer/react-client)
+Find the server (Node, .NET Core, Java) in the corresponding /server folders in this repo.
 
 ---
 
