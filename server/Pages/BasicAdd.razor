@@ -1,0 +1,76 @@
+@page "/basic-add"
+@using Reveal.Sdk
+@using Reveal.Sdk.Dom
+@using Newtonsoft.Json
+@inject IJSRuntime JSRuntime
+
+<div class="column-layout basic-add-container">
+
+   <div class="dropdown-row">
+    @* <IgbCombo 
+        Label="Select Customer"
+        @bind-Value="selectedCustomerId"
+        Data="@customerIds"
+        SingleSelect="true"
+        Class="dropdown"
+        Placeholder="Customer ID"
+        T="string">
+    </IgbCombo>
+
+    <IgbCombo 
+        Label="Select Order"
+        @bind-Value="selectedOrderId"
+        Data="@orderIds"
+        SingleSelect="true"
+        Class="dropdown"
+        Placeholder="Order ID"
+        T="string">
+    </IgbCombo> *@
+</div>
+
+
+
+    <div class="column-layout group">
+        <IgbButton Size="SizableComponentSize.Large" 
+            @onclick="OnNewDashboardClick" 
+            class="button" basic_add-scope>
+            New Dashboard
+            <IgbRipple></IgbRipple>
+        </IgbButton>
+    </div>
+    <div class="column-layout group_1">
+        <div id="revealView" class="reveal-dash-board" style="height: calc(100vh - 80px); width: 100%; position:relative;"></div>
+    </div>
+</div>
+
+@code {
+    private IgbDialog _nameDialog;
+    private string buttonText = "New Dashboard";
+    private bool isCreatingNewDashboard = false;
+    private string newDashboardName = "";
+    private RdashDocument dashboardDocument;
+
+private string[] selectedCustomerId = new[] { "BLONP" };
+private string[] selectedOrderId = new[] { "10248" };
+
+    private List<string> customerIds = new()
+    {
+        "ALFKI", "ANATR", "ANTON", "AROUT", "BERGS", "BLAUS", "BLONP",
+        "BOLID", "BONAP", "BOTTM", "BSBEV", "CACTU", "CENTC", "CHOPS",
+        "COMMI", "CONSH", "DRACD", "DUMON", "EASTC", "ERNSH"
+    };
+
+    private List<string> orderIds = new()
+    {
+        "10248", "10249", "10250", "10251", "10252", "10253", "10254", "10255"
+    };
+    private async Task OnNewDashboardClick()
+    {
+        var headers = new Dictionary<string, string>
+        {
+            { "x-header-customerId", selectedCustomerId.FirstOrDefault() ?? "" },
+            { "x-header-orderId", selectedOrderId.FirstOrDefault() ?? "" }
+        };
+        await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", "", headers);
+    }
+}

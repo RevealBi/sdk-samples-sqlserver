@@ -1,0 +1,64 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>RevealBlazorServer</RootNamespace>
+    <Platforms>AnyCPU;x64</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="IgniteUI.Blazor.Trial" Version="24.2.71" />
+    <PackageReference Include="Reveal.Sdk.AspNetCore" Version="1.7.3" />
+    <PackageReference Include="Reveal.Sdk.Data.Microsoft.SqlServer" Version="1.7.3" />
+    <PackageReference Include="Reveal.Sdk.Dom" Version="0.1.631-beta" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Dashboards\Accounts.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Banking.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Customers List.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Details.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Employee Sales Analysis.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Inventory.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Logistics.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Manufacturing.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Market Rents.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Order Details.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Orders Analysis.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Orders List by Country.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Dashboards\Product Orders.rdash">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Shared/MainLayout.razor.css" CssScope="master_view-scope" />
+    <None Update="Pages/BasicLoad.razor.css" CssScope="basic_load-scope" />
+    <None Update="Pages/BasicAdd.razor.css" CssScope="basic_add-scope" />
+    <None Update="Pages/FilterApi.razor.css" CssScope="filter_api-scope" />
+    <None Update="Pages/VizCatalog.razor.css" CssScope="viz_catalog-scope" />
+    <None Update="Pages/DashboardThumbnails.razor.css" CssScope="dashboard_thumbnails-scope" />
+  </ItemGroup>
+</Project>

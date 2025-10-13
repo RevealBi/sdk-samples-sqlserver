@@ -1,0 +1,67 @@
+@page "/dashboard-thumbnails"
+@using RevealBlazorServer.Models
+@inject IJSRuntime JSRuntime
+@inject DashboardService DashboardService
+@using RevealBlazorServer.Components
+
+<div class="row-layout dashboard-thumbnails-container">
+    <div class="column-layout group">
+
+    @if (dashboardNames != null && dashboardNames.Any())
+        {
+            <IgbList class="list" dashboard_thumbnails-scope>
+                @foreach (var item in dashboardNames)
+                {
+                    <IgbListItem 
+                        style="@SelectCustomCss(item.Id)" 
+                        @onclick="() => OnDashboardCardClicked(item)">
+                        <IgbCardMedia style="height: 50px; width: 100px;" slot="start">
+                            <DashboardThumbnail Info="@item.ThumbnailInfo" />
+                        </IgbCardMedia>
+                        <div slot="title">@item.DashboardTitle</div>
+                        <div slot="subtitle">@item.DashboardFilename</div>
+                    </IgbListItem>
+                }
+            </IgbList>
+        }
+        else
+        {
+            <p>Loading dashboards...</p>
+        }
+
+    </div>
+        <div class="column-layout group_1">
+            <div id="revealView" class="reveal-dash-board" style="height: calc(100vh - 0px); width: 100%; position:relative;"></div>
+        </div>
+    </div>
+
+@code {
+    private string selectedDashboard;
+    private string selectedDashboardKey;
+    private List<DashboardNamesWithThumbnail> dashboardNames;
+
+    protected override async Task OnInitializedAsync()
+    {
+        dashboardNames = await DashboardService.GetDashboardNamesWithThumbnailsAsync();
+        if (dashboardNames != null && dashboardNames.Any())
+        {
+            await OnDashboardCardClicked(dashboardNames.First());
+        }
+    }
+
+    private async Task OnDashboardCardClicked(DashboardNamesWithThumbnail dashboard)
+    {
+        selectedDashboard = dashboard.DashboardFilename;
+        selectedDashboardKey = dashboard.Id;
+
+        if (!string.IsNullOrEmpty(selectedDashboard))
+        {
+            await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", selectedDashboard);
+        }
+    }
+
+    private string SelectCustomCss(string key)
+    {
+        return key == selectedDashboardKey ? "background-color: #ededed; border-left: 4px solid #09B1A9;" : string.Empty;
+    }
+}

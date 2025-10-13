@@ -1,0 +1,82 @@
+.row-layout {
+    display: flex;
+}
+.viz-catalog-container {
+    justify-content: flex-start;
+    align-items: stretch;
+    align-content: flex-start;
+    height: 100%;
+}
+.column-layout {
+    display: flex;
+    flex-direction: column;
+}
+.group {
+    justify-content: flex-start;
+    align-items: stretch;
+    align-content: flex-start;
+    position: relative;
+    padding: 32px 16px 16px;
+    width: 30%;
+    min-width: 50px;
+    min-height: 50px;
+    max-width: 30%;
+}
+.group_1 {
+    justify-content: flex-start;
+    align-items: stretch;
+    align-content: flex-start;
+    overflow: auto;
+    position: relative;
+    min-width: 50px;
+    min-height: 50px;
+    flex-grow: 1;
+    flex-basis: 0;
+}
+.group_2 {
+    justify-content: flex-start;
+    align-items: stretch;
+    align-content: flex-start;
+    position: relative;
+    padding: 16px 0 0;
+    min-width: 50px;
+    min-height: 50px;
+    flex-grow: 1;
+    flex-basis: 0;
+}
+.group_3 {
+    justify-content: flex-start;
+    align-items: stretch;
+    align-content: flex-start;
+    gap: 0;
+    position: relative;
+    padding: 32px 16px 16px;
+    min-width: 50px;
+    min-height: 50px;
+    flex-grow: 1;
+    flex-basis: 0;
+}
+.list {
+    height: max-content;
+}
+.reveal-dash-board {
+    min-width: 400px;
+    min-height: 200px;
+}
+.avatar {
+    --ig-size: var(--ig-size-small);
+}
+.icon {
+    --size: 24px;
+    font-size: 24px;
+    width: 24px;
+    height: 24px;
+}
+.avatar::part(base) {
+    background-color: transparent;
+}
+.selected {
+    background-color: #ECFBFB; 
+    border-left: 4px solid #09B1A9;
+    outline: 2px dashed red !important;
+}

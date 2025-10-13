@@ -1,0 +1,78 @@
+@page "/filter-api"
+@using RevealBlazorServer.Models
+@inject DashboardService DashboardService
+@inject IJSRuntime JSRuntime
+
+<div class="row-layout filter-api-container">
+    <div class="column-layout group">
+        @if (employeeInfo == null)
+        {
+            <p>Loading employees...</p>
+        }
+        else
+        {
+            <IgbList class="list" filter_api-scope>
+                @foreach (var item in employeeInfo)
+                {
+                    <IgbListItem 
+                        style="@SelectCustomCss(item.Employee?.EmployeeID ?? 0)"
+                        @onclick="@(() => OnEmployeeCardClicked(item))">
+
+                        <IgbAvatar 
+                            Src="@(item.Employee?.PhotoPath ?? string.Empty)" 
+                            slot="start" 
+                            class="avatar" 
+                            filter_api-scope />
+
+                        <div slot="title">@item.FullName</div>
+                        <div slot="subtitle">@item.Employee?.Title</div>
+                    </IgbListItem>
+                }
+            </IgbList>
+        }
+    </div>
+
+    <div class="column-layout group_1">
+        <div id="revealView" class="reveal-dash-board" style="height: calc(100vh - 0px); width: 100%; position:relative;"></div>
+    </div>
+</div>
+
+@code {
+    private int selectedEmployee;
+    private List<EmployeeInfo> employeeInfo;
+
+    protected override async Task OnInitializedAsync()
+    {
+        employeeInfo = await DashboardService.GetEmployeesAsync();
+        if (employeeInfo != null && employeeInfo.Any())
+        {
+            await OnEmployeeCardClicked(employeeInfo.First());
+        }
+
+
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", "Employee Sales Analysis");
+        }
+    }
+
+    private async Task OnEmployeeCardClicked(EmployeeInfo employeeData)
+    {
+        selectedEmployee = employeeData.Employee?.EmployeeID ?? 0;
+
+        if (selectedEmployee != 0)
+        {
+            await JSRuntime.InvokeVoidAsync("setDashboardFilter", "revealView", "EmployeeID", selectedEmployee);
+        }
+    }
+
+    private string SelectCustomCss(int employeeId)
+    {
+        return employeeId == selectedEmployee ? "background-color: #ededed; border-left: 4px solid #09B1A9;" : string.Empty;
+    }
+}
