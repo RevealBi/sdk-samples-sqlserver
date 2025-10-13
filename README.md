@@ -1,4 +1,4 @@
-# What's in this GitHub Organization
+# Reveal + SQL Server E2E for PoC Kickoff
 
 You'll find everything you need to learn and implement a Reveal SDK application (both client and server) in this organization. This documents includes the general over of Reveal, links to source code for getting started samples, links to product documentation, support and video training.
 
