@@ -12,6 +12,7 @@ namespace RevealSdk.Server.Reveal
             {
                 SqlDs.Host = (string)userContext.Properties["Host"];
                 SqlDs.Database = (string)userContext.Properties["Database"];
+                //SqlDs.TrustServerCertificate = true; // required for debugging with self-signed certificates, should be false in production
             }
             return Task.FromResult(dataSource);
         }

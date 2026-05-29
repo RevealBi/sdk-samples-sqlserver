@@ -39,13 +39,13 @@ if (app.Environment.IsDevelopment())
 }
 
 // Using Reveal SDK to retrieve dashboard information to render thumbnail on client side
-app.MapGet("/dashboards/{name}/thumbnail", async (string name) =>
+app.MapGet("/dashboards/{name}/thumbnail", (string name) =>
 {
     var path = "dashboards/" + name + ".rdash";
     if (File.Exists(path))
     {
         var dashboard = new Dashboard(path);
-        var info = await dashboard.GetInfoAsync(Path.GetFileNameWithoutExtension(path));
+        var info = dashboard.GetInfo(name);
         return TypedResults.Ok(info);
     }
     else

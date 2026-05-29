@@ -27,15 +27,14 @@
 
     <div id="revealView"></div>
 
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" ></script>
-    <script src="https://unpkg.com/dayjs@1.8.21/dayjs.min.js" ></script>    
-    <script>window.revealDisableKeyboardManagement = true;</script>   
-    <script src="https://dl.revealbi.io/reveal/libs/1.8.3/infragistics.reveal.js"></script>
+    <script>window.revealDisableKeyboardManagement = true;</script>
 
-    <script type="text/javascript">        
-        $.ig.RevealSdkSettings.setBaseUrl("http://localhost:5111/reveal-api/");
-        $.ig.RevealSdkSettings.betaFeatures.enable("newTooltip");
-        
+    <script type="module">
+        import { RevealView, RevealSdkSettings, RVDashboard } from "https://cdn.jsdelivr.net/npm/reveal-sdk/dist/reveal-sdk.esm.js";
+
+        RevealSdkSettings.setBaseUrl("http://localhost:5111/reveal-api/");
+        RevealSdkSettings.betaFeatures.enable("newTooltip");
+
         let revealView;
         let dashboards = [];
         
@@ -89,9 +88,9 @@
             const loadingIndicator = document.getElementById('loadingIndicator');
             loadingIndicator.classList.add('show');
             
-            $.ig.RVDashboard.loadDashboard(dashboardFileName).then(dashboard => {
+            RVDashboard.loadDashboard(dashboardFileName).then(dashboard => {
                 if (!revealView) {
-                    revealView = new $.ig.RevealView("#revealView");
+                    revealView = new RevealView("#revealView");
                     revealView.interactiveFilteringEnabled = true;
                 }
                 revealView.dashboard = dashboard;
@@ -102,10 +101,8 @@
             });
         }
         
-        // Initialize when page loads
-        $(document).ready(function() {
-            loadDashboardNames();
-        });
+        // Initialize when page loads (module scripts run after the DOM is parsed)
+        loadDashboardNames();
     </script>
 </body>
 
