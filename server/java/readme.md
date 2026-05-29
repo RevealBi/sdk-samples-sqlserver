@@ -1,10 +1,10 @@
 # Reveal BI Java Spring Boot SQL Server Sample
 
-This sample uses the new Reveal BI Java SDK 2.0 through the `io.revealbi:reveal-sdk-servlet` artifact. It replaces the older Jersey registration model (`com.infragistics.reveal.sdk` 1.x) with a Spring Boot servlet registration for `RevealEngineServlet`.
+Spring Boot 3 server using the new Reveal BI Java SDK 2.0 (`io.revealbi:reveal-sdk-servlet`). The server mounts the Reveal API at `/reveal-api/*` (the wiki's standard pattern), serves the JavaScript client from the sibling `client/` folder at the root path, and exposes two helper endpoints from `DomController`.
 
 ## Run
 
-Optional — create `src/main/resources/application.properties` from the `application.properties.example` file and set your SQL Server connection values. The same values can also be supplied via environment variables (`SQL_SERVER_HOST`, `SQL_SERVER_DATABASE`, `SQL_SERVER_USERNAME`, `SQL_SERVER_PASSWORD`, `SQL_SERVER_SCHEMA`).
+Set your SQL Server credentials in `src/main/resources/application.properties` (copy from `application.properties.example`) or as environment variables (`SQL_SERVER_HOST`, `SQL_SERVER_DATABASE`, `SQL_SERVER_USERNAME`, `SQL_SERVER_PASSWORD`, `SQL_SERVER_SCHEMA`).
 
 **Windows (PowerShell):**
 ```powershell
@@ -16,34 +16,40 @@ Optional — create `src/main/resources/application.properties` from the `applic
 ./mvnw spring-boot:run -Dspring-boot.run.arguments=--server.port=5111
 ```
 
-The server listens on `http://localhost:5111`.
+Then open `http://localhost:5111/load-dashboard.html` (or `index.html`, `index-ds.html`, `index-dsi.html`) in a browser.
 
-## Endpoints
+## Routing
 
-| Path | Served by |
-|------|-----------|
-| `/reveal-api/*` | `RevealEngineServlet` (Reveal SDK 2.0 HTTP API) |
-| `/dashboards/names` | `DomController` (Spring MVC) — list dashboards in the `dashboards` folder |
-| `/dashboards/visualizations` | `DomController` (Spring MVC) — list visualizations from each dashboard |
-| `/images/**` | Spring MVC static resources |
+| Request | Handled by |
+|---------|-----------|
+| `/reveal-api/*` | `RevealEngineServlet` (Reveal SDK 2.0) |
+| `GET /dashboards/names`, `GET /dashboards/visualizations` | `DomController` (Spring MVC) |
+| `GET /`, `GET /index.html`, `GET /styles/common.css`, ... | Static files from `../../client/` via Spring's resource handler |
 
-## Client configuration
+This works because the servlet container routes `/reveal-api/*` to the Reveal servlet (path mapping) and everything else falls through to Spring's `DispatcherServlet` (default mapping `/`), which handles the controllers and resources.
 
-Because the Reveal API is mounted at `/reveal-api/*` (so it can coexist with `/dashboards/*` and `/images/**` served by Spring MVC), the client's base URL must include that prefix:
+The JavaScript client matches this layout by calling `RevealSdkSettings.setBaseUrl("http://localhost:5111/reveal-api/")` so its `${baseUrl}/dashboards/{id}/...` requests reach the Reveal servlet.
 
-```js
-$.ig.RevealSdkSettings.setBaseUrl("http://localhost:5111/reveal-api/");
-```
+## Files
 
-The HTML files under `../../client/` have already been updated to use that base URL. If you switch to a different server sample (Node.js, ASP.NET, Blazor) that mounts Reveal at `/`, revert the base URL back to `"http://localhost:5111/"`.
+- `RevealApplication.java` — Spring Boot entry point. Registers `RevealEngineServlet` at `/reveal-api/*` with `setAsyncSupported(true)`.
+- `WebConfig.java` — points Spring's resource handler at `../../client/` (so static files in that folder are served at the root) and maps `/` to `forward:/index.html`.
+- `UserContextProvider.java` — implements `io.revealbi.servlet.IRVServletUserContextProvider`, reads request headers and SQL Server settings to build an `RVUserContext`.
+- `AuthenticationProvider.java`, `DataSourceProvider.java`, `DashboardProvider.java`, `ObjectFilter.java` — the SDK providers used by `RevealServerBuilder`.
+- `PermissiveCorsFilter.java` — `jakarta.servlet.Filter` adding permissive CORS headers.
+- `DomController.java` + `VisualizationChartInfo.java` — Spring MVC controller exposing `/dashboards/names` and `/dashboards/visualizations`.
 
-## What changed when migrating from SDK 1.x
+## Migration from SDK 1.x
 
-- `pom.xml`: replaced `com.infragistics.reveal.sdk:reveal-sdk` 1.8.0 with `io.revealbi:reveal-sdk-servlet` 2.0.0. Removed `spring-boot-starter-jersey` and the `spring-boot-starter-tomcat` provided dependency; added the `release-stage` repository.
-- `RevealApplication.java`: now registers a `RevealEngineServlet` via `ServletRegistrationBean` using `RevealServerBuilder` to wire the providers.
-- `RevealJerseyConfig.java`: **removed** — Jersey is no longer used.
-- `CorsFilter.java`: replaced with `PermissiveCorsFilter.java`, a `jakarta.servlet.Filter` (the Jersey `ContainerRequestFilter`/`ContainerResponseFilter` model no longer applies).
-- `UserContextProvider.java`: `RVContainerRequestAwareUserContextProvider` was dropped in 2.0; this class now implements `io.revealbi.servlet.IRVServletUserContextProvider` and reads the user context directly from `HttpServletRequest`.
-- `AuthenticationProvider`, `DataSourceProvider`, `DashboardProvider`, `ObjectFilter`: switched their imports from `com.infragistics.reveal.sdk.*` to the new `io.revealbi.core.*` / `io.revealbi.core.data.*` packages. `IRVObjectFilter` no longer has a `filter(IRVUserContext, RVDashboardDataSource)` overload, so that method was removed.
-- `DomController.java`: converted from JAX-RS (`@Path`, `@GET`, `@Produces`) to Spring MVC (`@RestController`, `@RequestMapping`, `@GetMapping`).
-- Java 17 is required (it already was for Spring Boot 3.x).
+This sample was migrated from `com.infragistics.reveal.sdk:reveal-sdk` 1.8.0. See `JAVA-SDK-2.0-MIGRATION-GUIDE.md` at the root of the `Reveal` repo for per-file rationale.
+
+Summary of changes from the 1.x layout:
+
+- `pom.xml`: replaced `com.infragistics.reveal.sdk:reveal-sdk` 1.8.0 with `io.revealbi:reveal-sdk-servlet` 2.0.0. Removed `spring-boot-starter-jersey` and the provided `spring-boot-starter-tomcat`. Added the `release-stage` Maven repo.
+- Deleted `RevealJerseyConfig.java` (Jersey is gone) and the Jersey-based `CorsFilter.java`.
+- `RevealApplication.java` now registers `RevealEngineServlet` via `ServletRegistrationBean`, with the engine wired through `RevealServerBuilder`.
+- `UserContextProvider`: `RVContainerRequestAwareUserContextProvider` was dropped in 2.0; the class now implements `IRVServletUserContextProvider` and reads from `HttpServletRequest` directly.
+- All `com.infragistics.reveal.sdk.*` imports moved to `io.revealbi.core.*` / `io.revealbi.core.data.*`. The `IRVObjectFilter` overload that took an `RVDashboardDataSource` is gone.
+- `DomController`: converted from JAX-RS (`@Path`/`@GET`/`@Produces`) to Spring MVC (`@RestController`/`@RequestMapping`/`@GetMapping`).
+- `WebConfig`: previously pointed at bundled chart-type PNGs under `classpath:/static/images/`; now points at `../../client/` so the JS app is served from the same port.
+- Java 17+ is required (it already was for Spring Boot 3.x).
