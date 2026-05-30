@@ -44,12 +44,6 @@
     protected override async Task OnInitializedAsync()
     {
         employeeInfo = await DashboardService.GetEmployeesAsync();
-        if (employeeInfo != null && employeeInfo.Any())
-        {
-            await OnEmployeeCardClicked(employeeInfo.First());
-        }
-
-
         await base.OnInitializedAsync();
     }
 
@@ -58,6 +52,10 @@
         if (firstRender)
         {
             await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", "Employee Sales Analysis");
+            if (employeeInfo != null && employeeInfo.Any())
+            {
+                await OnEmployeeCardClicked(employeeInfo.First());
+            }
         }
     }
 

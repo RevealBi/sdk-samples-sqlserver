@@ -12,11 +12,12 @@
             <IgbList class="list" dashboard_thumbnails-scope>
                 @foreach (var item in dashboardNames)
                 {
+                    var currentItem = item;
                     <IgbListItem 
-                        style="@SelectCustomCss(item.Id)" 
-                        @onclick="() => OnDashboardCardClicked(item)">
+                        style="@SelectCustomCss(currentItem.Id)" 
+                        @onclick="() => OnDashboardCardClicked(currentItem)">
                         <IgbCardMedia style="height: 50px; width: 100px;" slot="start">
-                            <DashboardThumbnail Info="@item.ThumbnailInfo" />
+                            <DashboardThumbnail Name="@item.DashboardFilename" />
                         </IgbCardMedia>
                         <div slot="title">@item.DashboardTitle</div>
                         <div slot="subtitle">@item.DashboardFilename</div>
@@ -39,11 +40,16 @@
     private string selectedDashboard;
     private string selectedDashboardKey;
     private List<DashboardNamesWithThumbnail> dashboardNames;
+    private bool _isLoading = false;
 
     protected override async Task OnInitializedAsync()
     {
         dashboardNames = await DashboardService.GetDashboardNamesWithThumbnailsAsync();
-        if (dashboardNames != null && dashboardNames.Any())
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && dashboardNames != null && dashboardNames.Any())
         {
             await OnDashboardCardClicked(dashboardNames.First());
         }
@@ -51,12 +57,23 @@
 
     private async Task OnDashboardCardClicked(DashboardNamesWithThumbnail dashboard)
     {
+        if (_isLoading) return;
+        _isLoading = true;
+
         selectedDashboard = dashboard.DashboardFilename;
         selectedDashboardKey = dashboard.Id;
+        StateHasChanged();
 
-        if (!string.IsNullOrEmpty(selectedDashboard))
+        try
         {
-            await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", selectedDashboard);
+            if (!string.IsNullOrEmpty(selectedDashboard))
+            {
+                await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", selectedDashboard);
+            }
+        }
+        finally
+        {
+            _isLoading = false;
         }
     }
 

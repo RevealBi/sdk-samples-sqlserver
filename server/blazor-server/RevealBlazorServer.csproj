@@ -8,10 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="IgniteUI.Blazor.Trial" Version="24.2.71" />
-    <PackageReference Include="Reveal.Sdk.AspNetCore" Version="1.7.3" />
-    <PackageReference Include="Reveal.Sdk.Data.Microsoft.SqlServer" Version="1.7.3" />
-    <PackageReference Include="Reveal.Sdk.Dom" Version="0.1.631-beta" />
+    <PackageReference Include="IgniteUI.Blazor.Trial" Version="25.2.104" />
+    <PackageReference Include="Reveal.Sdk.AspNetCore" Version="2.0.0" />
+    <PackageReference Include="Reveal.Sdk.Data.Microsoft.SqlServer" Version="2.0.0" />
+    <PackageReference Include="Reveal.Sdk.Dom" Version="0.1.668-beta" />
   </ItemGroup>
 
   <ItemGroup>

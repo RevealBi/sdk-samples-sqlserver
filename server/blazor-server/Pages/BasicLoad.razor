@@ -29,9 +29,9 @@
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (firstRender)
+        if (firstRender && dashboards != null && dashboards.Any())
         {
-            await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", "Market Rents");
+            await JSRuntime.InvokeVoidAsync("loadRevealView", "revealView", dashboards.First().DashboardFileName);
         }
     }
 
