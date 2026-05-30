@@ -38,7 +38,7 @@ public class RevealApplication extends SpringBootServletInitializer {
         );
 
         ServletRegistrationBean<RevealEngineServlet> registration =
-            new ServletRegistrationBean<>(revealEngineServlet, "/reveal-api/*");
+            new ServletRegistrationBean<>(revealEngineServlet, "/*");
         registration.setAsyncSupported(true);
         registration.setLoadOnStartup(1);
         return registration;
