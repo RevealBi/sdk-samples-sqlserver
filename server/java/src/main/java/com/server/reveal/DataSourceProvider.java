@@ -1,18 +1,21 @@
 package com.server.reveal;
 
-import com.infragistics.reveal.sdk.api.IRVDataSourceProvider;
-import com.infragistics.reveal.sdk.api.IRVUserContext;
-import com.infragistics.reveal.sdk.api.model.*;
-import org.springframework.beans.factory.annotation.Value;
+import io.revealbi.core.IRVUserContext;
+import io.revealbi.core.data.IRVDataSourceProvider;
+import io.revealbi.core.data.RVAzureSqlDataSource;
+import io.revealbi.core.data.RVAzureSqlDataSourceItem;
+import io.revealbi.core.data.RVDashboardDataSource;
+import io.revealbi.core.data.RVDataSourceItem;
 import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
 
 @Component
 public class DataSourceProvider implements IRVDataSourceProvider {
-    
-    
+
+
     public RVDataSourceItem changeDataSourceItem(IRVUserContext userContext, String dashboardsID, RVDataSourceItem dataSourceItem) {
-        
+
         // ****
         // Every request for data passes thru changeDataSourceItem
         // You can set query properties based on the incoming requests
@@ -23,7 +26,7 @@ public class DataSourceProvider implements IRVDataSourceProvider {
         // - dsi.getTitle()
         // and take a specific action on the dsi as this request is processed
         // ****
-        
+
         if (!(dataSourceItem instanceof RVAzureSqlDataSourceItem)) {
             return dataSourceItem;
         }
@@ -35,12 +38,12 @@ public class DataSourceProvider implements IRVDataSourceProvider {
 
         // Get the UserContext properties
         String customerId = userContext.getUserId();
-        String orderId = userContext.getProperties().get("OrderId") != null ? 
+        String orderId = userContext.getProperties().get("OrderId") != null ?
             userContext.getProperties().get("OrderId").toString() : null;
         boolean isAdmin = "Admin".equals(userContext.getProperties().get("Role"));
 
         // Get filterTables from userContext properties
-        String[] filterTables = userContext.getProperties().get("FilterTables") instanceof String[] ? 
+        String[] filterTables = userContext.getProperties().get("FilterTables") instanceof String[] ?
             (String[]) userContext.getProperties().get("FilterTables") : new String[0];
 
         // Execute query based on the incoming client request
@@ -76,7 +79,7 @@ public class DataSourceProvider implements IRVDataSourceProvider {
                 }
                 break;
         }
-        
+
         return dataSourceItem;
     }
 
@@ -84,10 +87,9 @@ public class DataSourceProvider implements IRVDataSourceProvider {
         if (dataSource instanceof RVAzureSqlDataSource) {
             RVAzureSqlDataSource azureDataSource = (RVAzureSqlDataSource) dataSource;
 
-            // System.out.println((String) userContext.getProperties().get("Host"));
-
             azureDataSource.setHost((String) userContext.getProperties().get("Host"));
             azureDataSource.setDatabase((String) userContext.getProperties().get("Database"));
+            azureDataSource.setTrustServerCertificate(true); // required for debugging with self-signed certificates, should be false in production
         }
         return dataSource;
     }

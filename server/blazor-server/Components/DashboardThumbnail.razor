@@ -7,14 +7,14 @@
     private string DivId { get; set; } = $"thumbnailViewer_{componentCounter++}";
 
     [Parameter]
-    public IDictionary<string, object> Info { get; set; }
+    public string Name { get; set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
         {
             await Task.Delay(100);
-            await JSRuntime.InvokeVoidAsync("createDashboardThumbnail", DivId, Info);
+            await JSRuntime.InvokeVoidAsync("createDashboardThumbnail", DivId, Name);
         }
     }
 }

@@ -20,7 +20,7 @@
                                 <IgbAvatar Src="@($"/Images/Png/{item.VizChartType}.png")" slot="start" class="avatar" viz_catalog-scope />
                                 <div slot="title">@item.VizTitle</div>
                                 <div slot="subtitle">@item.VizChartType</div>
-                                <span @onclick="(e) => IconItemClick(item)" slot="end" class="material-icons icon">
+                                <span @onclick="(e) => IconItemClick(item)" slot="end" class="material-icons icon" style="cursor: pointer">
                                     add
                                 </span>
                             </IgbListItem>
@@ -62,7 +62,12 @@
     protected override async Task OnInitializedAsync()
     {
         visualizationChartInfo = DashboardService.GetVisualizationChartInfos();
-        if (visualizationChartInfo != null && visualizationChartInfo.Any())
+        await base.OnInitializedAsync();
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender && visualizationChartInfo != null && visualizationChartInfo.Any())
         {
             await ListItemClick(visualizationChartInfo.First());
         }

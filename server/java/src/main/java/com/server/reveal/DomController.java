@@ -1,5 +1,11 @@
 package com.server.reveal;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
@@ -10,33 +16,25 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-import jakarta.ws.rs.GET;
-import jakarta.ws.rs.Path;
-import jakarta.ws.rs.Produces;
-import jakarta.ws.rs.core.MediaType;
-
-@Path("/dashboards")
+@RestController
+@RequestMapping("/dashboards")
 public class DomController {
 
-    @GET
-    @Path("/visualizations")
-    @Produces(MediaType.APPLICATION_JSON)
-    public List<VisualizationChartInfo> getRdashData() {        
-        String dashboardsFolderPath = "dashboards"; 
+    @GetMapping("/visualizations")
+    public List<VisualizationChartInfo> getRdashData() {
+        String dashboardsFolderPath = "dashboards";
         List<VisualizationChartInfo> visualizationChartInfoList = new ArrayList<>();
 
         try {
             File folder = new File(dashboardsFolderPath);
-            File[] rdashFiles = folder.listFiles((dir, name) -> name.endsWith(".rdash")); 
+            File[] rdashFiles = folder.listFiles((dir, name) -> name.endsWith(".rdash"));
             if (rdashFiles == null || rdashFiles.length == 0) {
                 System.out.println("No .rdash files found in the folder");
                 return visualizationChartInfoList;
             }
 
             for (File rdashFile : rdashFiles) {
-                String fileNameWithoutExtension = rdashFile.getName().replaceFirst("[.][^.]+$", ""); 
+                String fileNameWithoutExtension = rdashFile.getName().replaceFirst("[.][^.]+$", "");
                 String jsonContent = extractJsonFromRdash(rdashFile.getPath());
                 if (jsonContent.isEmpty()) {
                     System.out.println("No JSON content found in the rdash file: " + rdashFile.getName());
@@ -56,9 +54,7 @@ public class DomController {
         return visualizationChartInfoList;
     }
 
-    @GET
-    @Path("/names")
-    @Produces(MediaType.APPLICATION_JSON)
+    @GetMapping("/names")
     public List<DashboardInfo> getDashboardNames() {
         String dashboardsFolderPath = "dashboards";
         List<DashboardInfo> dashboardNamesList = new ArrayList<>();
@@ -103,7 +99,7 @@ public class DomController {
                             jsonContent.append(line);
                         }
                     }
-                    break; 
+                    break;
                 }
             }
         } catch (IOException e) {
@@ -115,31 +111,31 @@ public class DomController {
 
     public String extractTitleFromJson(String jsonContent) {
         JSONObject jsonObject = new JSONObject(jsonContent);
-        return jsonObject.optString("Title", "Untitled"); 
+        return jsonObject.optString("Title", "Untitled");
     }
 
     public List<VisualizationChartInfo> parseWidgetsFromJson(String jsonContent, String dashboardFileName, String dashboardTitle) {
         List<VisualizationChartInfo> widgetInfoList = new ArrayList<>();
         JSONObject jsonObject = new JSONObject(jsonContent);
-    
+
         if (!jsonObject.has("Widgets")) {
             System.out.println("No widgets found in the JSON");
             return widgetInfoList;
         }
-    
+
         JSONArray widgets = jsonObject.getJSONArray("Widgets");
-    
+
         for (int i = 0; i < widgets.length(); i++) {
             JSONObject widget = widgets.getJSONObject(i);
 
             String vizId = widget.optString("Id", "Unknown Id");
-            String vizTitle = widget.optString("Title", "Untitled");    
+            String vizTitle = widget.optString("Title", "Untitled");
             JSONObject visualizationSettings = widget.optJSONObject("VisualizationSettings");
-            String vizChartType = "Unknown Chart Type"; 
-    
+            String vizChartType = "Unknown Chart Type";
+
             if (visualizationSettings != null) {
                 String type = visualizationSettings.optString("_type");
-    
+
                 switch (type) {
                     case "IndicatorVisualizationSettingsType":
                         vizChartType = "KpiTime";
@@ -167,19 +163,19 @@ public class DomController {
                         break;
                     case "PivotVisualizationSettingsType":
                         vizChartType = "Pivot";
-                        break;                        
+                        break;
                     case "ChoroplethMapVisualizationSettingsType":
                         vizChartType = "Choropleth";
-                    break;     
+                    break;
                     case "CompositeVisualizationSettingsType":
                         vizChartType = "Combo";
-                        break; 
+                        break;
                     default:
                         vizChartType = visualizationSettings.optString("ChartType", "Unknown Chart Type");
                         break;
                 }
             }
-    
+
             String vizImageUrl = getImageUrl(vizChartType);
             widgetInfoList.add(new VisualizationChartInfo(
                     dashboardFileName, dashboardTitle, vizId, vizTitle, vizChartType, vizImageUrl
@@ -187,7 +183,7 @@ public class DomController {
         }
         return widgetInfoList;
     }
-    
+
     public String getImageUrl(String input) {
         String visualizationSuffix = "Visualization";
         if (input.toLowerCase().endsWith(visualizationSuffix.toLowerCase())) {

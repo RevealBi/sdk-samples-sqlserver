@@ -9,7 +9,7 @@ public class DashboardNames
 
 public class DashboardNamesWithThumbnail
 {
-    public string Id { get; set; } = Guid.NewGuid().ToString(); 
+    public string Id => DashboardFilename;
     public string DashboardFilename { get; set; }
     public string DashboardTitle { get; set; }
     public IDictionary<string, object> ThumbnailInfo { get; set; }

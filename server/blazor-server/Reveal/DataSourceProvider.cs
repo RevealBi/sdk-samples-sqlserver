@@ -40,18 +40,12 @@ namespace RevealSdk.Server.Reveal
 
                 else if (sqlDsi.Id == "CustomerOrders")
                 {
-                    sqlDsi.CustomQuery = "SELECT      CAST(YEAR(O.OrderOrderDate) AS INT) " +
-                        "AS OrderYear,     COUNT(O.OrderID) AS TotalOrders FROM      " +
-                        "OrderLineItems AS O  WHERE O.CustomerID = '" + userContext.UserId + 
-                        "' GROUP BY      YEAR(O.OrderOrderDate)";
+                    sqlDsi.CustomQuery = "SELECT CAST(YEAR(O.OrderDate) AS INT) " +
+                        "AS OrderYear, COUNT(O.OrderID) AS TotalOrders FROM " +
+                        "Orders AS O WHERE O.CustomerID = '" + userContext.UserId +
+                        "' GROUP BY YEAR(O.OrderDate)";
                 }
 
-                else if (sqlDsi.Id == "TenMostExpensiveProducts")
-                {
-                    sqlDsi.Title = "Ten Most Expensive Products";
-                    sqlDsi.Subtitle = "Whatever";
-                    sqlDsi.Procedure = "Ten Most Expensive Products";
-                }
                 else if (sqlDsi.Table == "OrdersQry")
                 {
                     //sqlDsi.Database = "devtest";
@@ -66,8 +60,9 @@ namespace RevealSdk.Server.Reveal
         {
             if (dataSource is RVSqlServerDataSource sqlDs)
             {
-                sqlDs.Host = "database.windows.net";
+                sqlDs.Host = "your-server.database.windows.net";
                 sqlDs.Database = "northwind";
+                sqlDs.TrustServerCertificate = true; // required for debugging with self-signed certificates, should be false in production
             }
             return Task.FromResult(dataSource);
         }

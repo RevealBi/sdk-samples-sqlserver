@@ -1,34 +1,35 @@
 package com.server.reveal;
 
-import com.infragistics.reveal.sdk.api.IRVUserContext;
-import com.infragistics.reveal.sdk.base.RVUserContext;
-import com.infragistics.reveal.sdk.rest.RVContainerRequestAwareUserContextProvider;
+import io.revealbi.core.IRVUserContext;
+import io.revealbi.core.RVUserContext;
+import io.revealbi.servlet.IRVServletUserContextProvider;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
 import java.util.HashMap;
-import jakarta.ws.rs.container.ContainerRequestContext;
 
 @Component
-public class UserContextProvider extends RVContainerRequestAwareUserContextProvider {
-    
+public class UserContextProvider implements IRVServletUserContextProvider {
+
     @Value("${SQL_SERVER_HOST:localhost}")
     private String sqlServerHost;
-    
+
     @Value("${SQL_SERVER_DATABASE:Northwind}")
     private String sqlServerDatabase;
-    
+
     @Value("${SQL_SERVER_USERNAME:sa}")
     private String sqlServerUsername;
-    
+
     @Value("${SQL_SERVER_PASSWORD:password}")
     private String sqlServerPassword;
-    
+
     @Value("${SQL_SERVER_SCHEMA:dbo}")
     private String sqlServerSchema;
 
     @Override
-    protected IRVUserContext getUserContext(ContainerRequestContext requestContext) {
-        String headerValue = requestContext.getHeaderString("x-header-one");
+    public IRVUserContext getUserContext(HttpServletRequest request) {
+        String headerValue = request.getHeader("x-header-one");
         String userId = null;
         String orderId = null;
 
@@ -51,13 +52,13 @@ public class UserContextProvider extends RVContainerRequestAwareUserContextProvi
         // default to User role
         String role = "User";
 
-        // null is used here just for demo 
+        // null is used here just for demo
         if ("BLONP".equals(userId) || userId == null) {
             role = "Admin";
         }
 
-        String[] filterTables = role.equals("Admin") 
-            ? new String[0] 
+        String[] filterTables = role.equals("Admin")
+            ? new String[0]
             : new String[]{"Customers", "Orders"};
 
         var props = new HashMap<String, Object>();
@@ -70,6 +71,6 @@ public class UserContextProvider extends RVContainerRequestAwareUserContextProvi
         props.put("Schema", sqlServerSchema);
         props.put("FilterTables", filterTables);
 
-        return new RVUserContext(userId, props); 
+        return new RVUserContext(userId, props);
     }
 }

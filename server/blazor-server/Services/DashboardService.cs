@@ -52,26 +52,23 @@ public class DashboardService
         var dashboardNames = new List<DashboardNamesWithThumbnail>();
 
         string folderPath = Path.Combine(Directory.GetCurrentDirectory(), "Dashboards");
-        var files = Directory.GetFiles(folderPath, "*.rdash"); 
+        var directoryInfo = new DirectoryInfo(folderPath);
+        var files = directoryInfo.GetFiles("*.rdash");
 
-        var tasks = files.Select(async file =>
+        var tasks = files.Select(async fileInfo =>
         {
             try
             {
-                var dashboard = new Dashboard(file);
-                var thumbnailInfo = await dashboard.GetInfoAsync(Path.GetFileNameWithoutExtension(file).ToString());
-                var info = await dashboard.GetInfoAsync(Path.GetFileNameWithoutExtension(file));
-
+                var dashboard = RdashDocument.Load(fileInfo.FullName);
                 return new DashboardNamesWithThumbnail
                 {
-                    DashboardFilename = Path.GetFileNameWithoutExtension(file),
-                    DashboardTitle = RdashDocument.Load(file).Title,
-                    ThumbnailInfo = info.Info
+                    DashboardFilename = Path.GetFileNameWithoutExtension(fileInfo.Name),
+                    DashboardTitle = RdashDocument.Load(fileInfo.FullName).Title,
                 };
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error Reading FileData {file}: {ex.Message}");
+                Console.WriteLine($"Error Reading FileData {fileInfo.FullName}: {ex.Message}");
                 return null;
             }
         });
@@ -126,27 +123,6 @@ public class DashboardService
         {
             Console.WriteLine($"Visualization extraction error: {ex.Message}");
             throw;
-        }
-    }
-
-    public async Task<object?> GetDashboardThumbnailInfoAsync(string dashboardName)
-    {
-        try
-        {
-            var path = Path.Combine(_dashboardPath, $"{dashboardName}.rdash");
-
-            if (!File.Exists(path))
-                return null;
-
-            var dashboard = new Dashboard(path);
-            var info = await dashboard.GetInfoAsync(Path.GetFileNameWithoutExtension(path));
-
-            return info;
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Error loading thumbnail for dashboard '{dashboardName}': {ex.Message}");
-            return null;
         }
     }
 

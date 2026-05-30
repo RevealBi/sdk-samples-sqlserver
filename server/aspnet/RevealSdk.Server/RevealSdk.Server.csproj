@@ -5,11 +5,12 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <Platforms>AnyCPU;x64</Platforms>
+    <UserSecretsId>2a7348e1-f76e-4977-819b-73eb9b814241</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Reveal.Sdk.AspNetCore" Version="1.8.3" />
-    <PackageReference Include="Reveal.Sdk.Data.Microsoft.SqlServer" Version="1.8.3" />
+    <PackageReference Include="Reveal.Sdk.AspNetCore" Version="2.0.0" />
+    <PackageReference Include="Reveal.Sdk.Data.Microsoft.SqlServer" Version="2.0.0" />
     <PackageReference Include="Reveal.Sdk.Dom" Version="0.1.656-beta" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>

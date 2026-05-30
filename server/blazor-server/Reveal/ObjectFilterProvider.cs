@@ -9,7 +9,7 @@ namespace RevealSdk.Server.Reveal
     {
         public Task<bool> Filter(IRVUserContext userContext, RVDashboardDataSource dataSource)
         {
-            throw new NotImplementedException();
+            return Task.FromResult(true);
         }
         public Task<bool> Filter(IRVUserContext userContext, RVDataSourceItem dataSourceItem)
         {

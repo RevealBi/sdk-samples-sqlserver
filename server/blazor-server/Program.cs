@@ -37,6 +37,7 @@ builder.Services.AddControllers().AddReveal(builder =>
         //{
         //    settings.License = "eyJhbGciOicCI6IkpXVCJ9.e";
         //})
+        .AddDashboardProvider<DashboardProvider>()
         .AddAuthenticationProvider<AuthenticationProvider>()
         .AddDataSourceProvider<DataSourceProvider>()
         .AddUserContextProvider<UserContextProvider>()
@@ -60,9 +61,7 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 app.UseHttpsRedirection();
-app.UseRouting();
 app.UseStaticFiles();
-
 app.UseRouting();
 
 app.MapBlazorHub();

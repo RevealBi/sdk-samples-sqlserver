@@ -1,15 +1,17 @@
-﻿let additionalHeaders = {};
+﻿
+let additionalHeaders = {};
 
 window.loadRevealView = async function (viewId, dashboardName, headers) {
     let rvDashboard;
 
+
     if (dashboardName) {
-        rvDashboard = await $.ig.RVDashboard.loadDashboard(dashboardName);
+        rvDashboard = await Reveal.RVDashboard.loadDashboard(dashboardName);
     }
 
     additionalHeaders = headers || {};
 
-    $.ig.RevealSdkSettings.setAdditionalHeadersProvider(function (url) {
+    Reveal.RevealSdkSettings.setAdditionalHeadersProvider(function (url) {
         return headers;
     });
     const revealView = createRevealView(viewId);
@@ -17,59 +19,63 @@ window.loadRevealView = async function (viewId, dashboardName, headers) {
         revealView.startInEditMode = true;
 
         revealView.onDataSourcesRequested = (callback) => {
-            var sqlServerDataSource = new $.ig.RVAzureSqlDataSource();
+            var sqlServerDataSource = new Reveal.RVAzureSqlDataSource();
             sqlServerDataSource.id="sqlServer";
             sqlServerDataSource.title = "SQL Server Data Source";
             sqlServerDataSource.subtitle = "Full Northwind Database";
-    
+
             // SQL Server Data Source Item in Stored Procs
-            var sqlDataSourceItem1 = new $.ig.RVAzureSqlDataSourceItem(sqlServerDataSource);
+            var sqlDataSourceItem1 = new Reveal.RVAzureSqlDataSourceItem(sqlServerDataSource);
             sqlDataSourceItem1.id="CustomerOrders";
             sqlDataSourceItem1.title = "Customer Orders";
             sqlDataSourceItem1.subtitle = "Custom SQL Query (orderId)";
-    
-            var sqlDataSourceItem2 = new $.ig.RVAzureSqlDataSourceItem(sqlServerDataSource);
+
+            var sqlDataSourceItem2 = new Reveal.RVAzureSqlDataSourceItem(sqlServerDataSource);
             sqlDataSourceItem2.id="CustOrderHist";
             sqlDataSourceItem2.title = "Customer Orders History";
             sqlDataSourceItem2.subtitle = "Stored Procedure (customerId)";
-    
-            var sqlDataSourceItem3 = new $.ig.RVAzureSqlDataSourceItem(sqlServerDataSource);
+
+            var sqlDataSourceItem3 = new Reveal.RVAzureSqlDataSourceItem(sqlServerDataSource);
             sqlDataSourceItem3.id="CustOrdersOrders";
             sqlDataSourceItem3.title = "Customer Orders Orders";
             sqlDataSourceItem3.subtitle = "Stored Procedure  (customerId)";
-    
-            var sqlDataSourceItem4 = new $.ig.RVAzureSqlDataSourceItem(sqlServerDataSource);
+
+            var sqlDataSourceItem4 = new Reveal.RVAzureSqlDataSourceItem(sqlServerDataSource);
             sqlDataSourceItem4.id="TenMostExpensiveProducts";
             sqlDataSourceItem4.title = "Ten Most Expensive Products";
             sqlDataSourceItem4.subtitle = "Stored Procedure";
 
             // ***** Excel Files *****
-             var localFileItem = new $.ig.RVLocalFileDataSourceItem();
+            var localFileItem = new Reveal.RVLocalFileDataSourceItem();
             localFileItem.id = "Northwind Traders Corp Sales"
-            var excelDataSourceItem  = new $.ig.RVExcelDataSourceItem(localFileItem);
+            var excelDataSourceItem  = new Reveal.RVExcelDataSourceItem(localFileItem);
             excelDataSourceItem.id = "Northwind Traders Corp Sales";
             excelDataSourceItem.title = "Northwind Traders Corp Sales";
 
-            var localFileItem1 = new $.ig.RVLocalFileDataSourceItem();
+            var localFileItem1 = new Reveal.RVLocalFileDataSourceItem();
             localFileItem1.id = "IceCreamCoFinancials"
-            var excelDataSourceItem1 = new $.ig.RVExcelDataSourceItem(localFileItem1);
+            var excelDataSourceItem1 = new Reveal.RVExcelDataSourceItem(localFileItem1);
             excelDataSourceItem1.id = "IceCreamCoFinancials";
             excelDataSourceItem1.title = "IceCreamCoFinancials";
             //**********************************************
             // Note, this is the callback that loads everything above into the dialog.  If you don't want to show the entire
             // database, just remove sqlServerDataSource from the array and leave it empty like this []
-            callback(new $.ig.RevealDataSources([sqlServerDataSource],
+            callback(new Reveal.RevealDataSources([sqlServerDataSource],
                 [sqlDataSourceItem1, sqlDataSourceItem2, sqlDataSourceItem3, sqlDataSourceItem4,
                     excelDataSourceItem, excelDataSourceItem1], false));
-    
-            };
+
+        };
     }
     revealView.dashboard = rvDashboard;
 }
 
+
 window.createRevealView = function (viewId) {
-    $.ig.RevealSdkSettings.theme = createRevealTheme(viewId);
-    const revealView = new $.ig.RevealView("#" + viewId);
+    Reveal.RevealSdkSettings.theme = createRevealTheme();
+    if (!_revealViewInstances[viewId]) {
+        _revealViewInstances[viewId] = new Reveal.RevealView("#" + viewId);
+    }
+    const revealView = _revealViewInstances[viewId];
     revealView.interactiveFilteringEnabled = true;
 
     revealView.onDashboardSelectorRequested = (args) => {
@@ -77,14 +83,15 @@ window.createRevealView = function (viewId) {
     };
 
     revealView.onLinkedDashboardProviderAsync = (dashboardId, title) => {
-        return $.ig.RVDashboard.loadDashboard(dashboardId);
+        return Reveal.RVDashboard.loadDashboard(dashboardId);
     };
 
     return revealView;
-  }
+}
+
 
 window.createRevealTheme = function () {
-    var theme = $.ig.RevealSdkSettings.theme.clone();
+    var theme = Reveal.RevealSdkSettings.theme.clone();
     theme.chartColors = ["#09B1A9", "#003B4A", "#93C569", "#FEB51E", "#FF780D", "#CA365B"];
     theme.regularFont = "Poppins";
     theme.mediumFont = "Poppins";
@@ -94,11 +101,9 @@ window.createRevealTheme = function () {
     return theme;
 }
 
-window.createDashboardThumbnail = function (id, info) {
-    console.log("info " + info);
-    $.ig.RevealSdkSettings.theme = createRevealTheme(id, "");
-    let thumbnailView = new $.ig.RevealDashboardThumbnailView("#" + id);
-    thumbnailView.dashboardInfo = info;
+
+window.createDashboardThumbnail = function (id, name) {
+    Reveal.RVThumbnail.fromDashboard("#" + id, name);
 }
 
 function downloadFile(url, filename) {
@@ -110,17 +115,20 @@ function downloadFile(url, filename) {
     document.body.removeChild(link);
 }
 
+
 window.getRVDashboardAsJson = async function (dashboardName) {
-    const dashboard = await $.ig.RVDashboard.loadDashboard(dashboardName);
-    const json = dashboard._dashboardModel.__dashboardModel.toJson();
+    const dashboard = await Reveal.RVDashboard.loadDashboard(dashboardName);
+    const json = dashboard._dashboardModel._dashboardModel.toJson();
     return JSON.stringify(json);
 }
 
- $.ig.RevealSdkSettings.enableActionsOnHoverTooltip = true;
+
+ Reveal.RevealSdkSettings.enableActionsOnHoverTooltip = true;
+
 
 window.loadRevealViewSingleViz = function (viewId, dashboardName, vizId) {
-    $.ig.RVDashboard.loadDashboard(dashboardName).then(dashboard => {
-        var revealView = new $.ig.RevealView("#" + viewId);
+    Reveal.RVDashboard.loadDashboard(dashboardName).then(dashboard => {
+        var revealView = new Reveal.RevealView("#" + viewId);
         revealView.interactiveFilteringEnabled = true;
         revealView.singleVisualizationMode = true;
         //revealView.showHeader = false;
@@ -131,8 +139,9 @@ window.loadRevealViewSingleViz = function (viewId, dashboardName, vizId) {
 }
 
 
+
 window.registerAddDashboardInstance = function (dotnetRef) {
-    window.revealAddView = new $.ig.RevealView(document.getElementById("revealView"));
+    window.revealAddView = new Reveal.RevealView(document.getElementById("revealView"));
     revealAddView.hoverTooltipsEnabled = true;
     revealAddView.interactiveFilteringEnabled = true;
     revealAddView.startInEditMode = true;
@@ -142,23 +151,30 @@ window.registerAddDashboardInstance = function (dotnetRef) {
     };
 };
 
-window.setDashboardFilter = async function (viewId, filterTitle, filterValue) {
-    let rvDashboard = await $.ig.RVDashboard.loadDashboard("Employee Sales Analysis");
-    const revealView = new $.ig.RevealView("#" + viewId);
-    revealView.dashboard = rvDashboard;
 
-    const territoryFilter = revealView.dashboard.filters.getByTitle(filterTitle);
-    if (territoryFilter) {
-        territoryFilter.selectedValues = [filterValue];
+let _revealViewInstances = {};
+
+window.setDashboardFilter = async function (viewId, filterTitle, filterValue) {
+    const revealView = _revealViewInstances[viewId];
+    if (!revealView || !revealView.dashboard) {
+        console.warn("RevealView not ready for viewId:", viewId);
+        return;
+    }
+    const filter = revealView.dashboard.filters.getByTitle(filterTitle);
+    if (filter) {
+        filter.selectedValues = [filterValue];
     } else {
         console.warn("Filter not found:", filterTitle);
     }
 }
 
 window.loadRevealViewWithDom = async function (viewId, json) {
-    const document = dom.RdashDocument.loadFromJson(json);
-    const dashboard = await document.toRVDashboard();
-    var revealView = new $.ig.RevealView("#" + viewId);
+    const rdashDoc = dom.RdashDocument.loadFromJson(json);
+    const dashboard = await rdashDoc.toRVDashboard();
+    if (!_revealViewInstances[viewId]) {
+        _revealViewInstances[viewId] = new Reveal.RevealView("#" + viewId);
+    }
+    const revealView = _revealViewInstances[viewId];
     revealView.interactiveFilteringEnabled = true;
     revealView.startInEditMode = true;
     revealView.dashboard = dashboard;

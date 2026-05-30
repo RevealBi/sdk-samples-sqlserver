@@ -102,6 +102,7 @@ const dataSourceProvider = async (userContext, dataSource) => {
         const database = userContext.properties.get("Database") || process.env.SQL_SERVER_DATABASE;        
         dataSource.host = host;
         dataSource.database = database;
+        dataSource.trustServerCertificate = true; // For local dev with self-signed certs, not recommended for production
   }
   return dataSource;
 }

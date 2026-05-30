@@ -123,6 +123,7 @@ const dataSourceProvider = async (userContext: IRVUserContext | null, dataSource
         const database = userContext?.properties.get("Database") as string || process.env.SQL_SERVER_DATABASE as string;        
         dataSource.host = host;
         dataSource.database = database;
+        dataSource.trustServerCertificate = true; // For local development with self-signed certs, not recommended for production
   }
   return dataSource;
 }
