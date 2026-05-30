@@ -118,7 +118,7 @@ function downloadFile(url, filename) {
 
 window.getRVDashboardAsJson = async function (dashboardName) {
     const dashboard = await Reveal.RVDashboard.loadDashboard(dashboardName);
-    const json = dashboard._dashboardModel.__dashboardModel.toJson();
+    const json = dashboard._dashboardModel._dashboardModel.toJson();
     return JSON.stringify(json);
 }
 
