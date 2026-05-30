@@ -89,6 +89,7 @@ public class DataSourceProvider implements IRVDataSourceProvider {
 
             azureDataSource.setHost((String) userContext.getProperties().get("Host"));
             azureDataSource.setDatabase((String) userContext.getProperties().get("Database"));
+            azureDataSource.setTrustServerCertificate(true); // required for debugging with self-signed certificates, should be false in production
         }
         return dataSource;
     }
