@@ -60,8 +60,8 @@ namespace RevealSdk.Server.Reveal
         {
             if (dataSource is RVSqlServerDataSource sqlDs)
             {
-                sqlDs.Host = "your-server.database.windows.net";
-                sqlDs.Database = "northwind";
+                sqlDs.Host = (string)userContext.Properties["Host"];
+                sqlDs.Database = (string)userContext.Properties["Database"];
                 sqlDs.TrustServerCertificate = true; // required for debugging with self-signed certificates, should be false in production
             }
             return Task.FromResult(dataSource);

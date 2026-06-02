@@ -1,9 +1,15 @@
 using IgniteUI.Blazor.Controls;
 using Reveal.Sdk;
+using RevealSdk.Server.Configuration;
 using RevealSdk.Server.Reveal;
 using Reveal.Sdk.Data;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Bind the "SqlServer" configuration section (appsettings.json /
+// appsettings.Development.json) to SqlServerOptions.
+builder.Services.Configure<SqlServerOptions>(
+    builder.Configuration.GetSection("SqlServer"));
 
 // Add services to the container.
 builder.Services.AddRazorPages();

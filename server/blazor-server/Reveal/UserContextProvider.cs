@@ -1,9 +1,18 @@
-﻿using Reveal.Sdk;
+﻿using Microsoft.Extensions.Options;
+using Reveal.Sdk;
+using RevealSdk.Server.Configuration;
 
 namespace RevealSdk.Server.Reveal
 {
     public class UserContextProvider : IRVUserContextProvider
     {
+        private readonly SqlServerOptions _sqlOptions;
+
+        public UserContextProvider(IOptions<SqlServerOptions> sqlOptions)
+        {
+            _sqlOptions = sqlOptions.Value;
+        }
+
         IRVUserContext IRVUserContextProvider.GetUserContext(HttpContext aspnetContext)
         {
 
@@ -25,7 +34,12 @@ namespace RevealSdk.Server.Reveal
             var props = new Dictionary<string, object>() {
                     { "OrderId", orderId },
                     { "EmployeeId", employeeId },
-                    { "Role", role } };
+                    { "Role", role },
+                    { "Host", _sqlOptions.Host },
+                    { "Database", _sqlOptions.Database },
+                    { "Username", _sqlOptions.Username },
+                    { "Password", _sqlOptions.Password },
+                    { "Schema", _sqlOptions.Schema } };
 
             Console.WriteLine("UserContextProvider: " + userId + " " + orderId + " " + employeeId);
             

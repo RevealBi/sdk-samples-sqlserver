@@ -13,7 +13,9 @@ namespace RevealSdk.Server.Reveal
             
             if (dataSource is RVSqlServerDataSource)
             {
-                userCredential = new RVUsernamePasswordDataSourceCredential("", "");
+                userCredential = new RVUsernamePasswordDataSourceCredential(
+                    (string)userContext.Properties["Username"],
+                    (string)userContext.Properties["Password"]);
             }
             return Task.FromResult(userCredential);
         }
